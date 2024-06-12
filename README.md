@@ -7,7 +7,6 @@ Developer-side code for the construction of EPTIC.
 Installing [Bertalign](https://github.com/bfsujason/bertalign) and [WhisperX](https://github.com/m-bain/whisperX) in 5 steps:
 
 ```
-
 git clone https://github.com/ffedox/eptic-pipeline3/
 
 conda env create -f environment.yml
