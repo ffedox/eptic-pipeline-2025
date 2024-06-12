@@ -1,3 +1,5 @@
-# eptic-pipeline3
+Already present on our servers.
 
-Test
+For info on how to install ffmpeg:
+
+https://ffmpeg.org/download.html

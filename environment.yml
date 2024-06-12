@@ -1,4 +1,4 @@
-name: bertalign-eptic
+name: pipeline-eptic
 channels:
   - pytorch
   - nvidia
