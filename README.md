@@ -16,4 +16,5 @@ pip install git+https://github.com/m-bain/whisperx.git
 whisperx /home/afedotova/eptic-pipeline2/eptic-pipeline3/data/0001.wmv
 ```
 
+Additionally you may want to install ffmpeg for manipulating video files and extracting audio tracks.
 
