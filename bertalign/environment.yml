@@ -1,4 +1,4 @@
-name: bertalign5
+name: bertalign-eptic
 channels:
   - pytorch
   - nvidia

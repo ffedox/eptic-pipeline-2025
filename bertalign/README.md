@@ -8,7 +8,7 @@ conda env create -f environment.yml
 
 Then activate it:
 
-conda activate bertalign5
+conda activate bertalign-eptic
 
 And install Bertalign:
 
