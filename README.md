@@ -4,7 +4,7 @@ Developer-side code for the construction of EPTIC.
 
 # Installation
 
-Installing [Bertalign]([https://ffmpeg.org/download.html](https://github.com/bfsujason/bertalign)) and [WhisperX]([[https://ffmpeg.org/download.html](https://github.com/bfsujason/bertalign](https://github.com/m-bain/whisperX)) in 5 steps:
+Installing [Bertalign](https://github.com/bfsujason/bertalign) and [WhisperX](https://github.com/m-bain/whisperX) in 5 steps:
 
 ```
 
