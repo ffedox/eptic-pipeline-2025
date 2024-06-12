@@ -1,6 +1,6 @@
 # eptic-pipeline
 
-Developer-side code for the construction of EPTIC.
+Developer-side code and documentation for the construction of EPTIC.
 
 # Installation
 
