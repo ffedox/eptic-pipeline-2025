@@ -14,6 +14,8 @@ pip install torch==2.0.0+cu117 torchaudio==2.0.0+cu117 -f https://download.pytor
 pip install git+https://github.com/m-bain/whisperx.git
 ```
 
+When reusing this repository activate the conda environment again with conda activate pipeline-eptic2.
+
 Additionally, you may want to [install ffmpeg](https://ffmpeg.org/download.html) for manipulating video files and extracting audio tracks.
 
 # EPTIC Workflow
