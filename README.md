@@ -8,13 +8,9 @@ Installing [Bertalign](https://github.com/bfsujason/bertalign) and [WhisperX](ht
 
 ```
 git clone https://github.com/ffedox/eptic-pipeline3/
-
 conda env create -f environment.yml
-
 conda activate pipeline-eptic2
-
 pip install torch==2.0.0+cu117 torchaudio==2.0.0+cu117 -f https://download.pytorch.org/whl/torch_stable.html
-
 pip install git+https://github.com/m-bain/whisperx.git
 ```
 
