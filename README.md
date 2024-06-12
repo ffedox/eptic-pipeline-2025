@@ -20,7 +20,10 @@ Additionally, you may want to [install ffmpeg](https://ffmpeg.org/download.html)
 
 # EPTIC Workflow
 
-![Eptic Workflow](eptic_workflow.jpg)
+1. Video and text extraction
+2. Transcription
+3. Sentence alignment
+4. Manual metadata selection and review
 
 # Guided Example
 
