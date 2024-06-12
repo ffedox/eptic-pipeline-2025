@@ -1,4 +1,6 @@
-# eptic-pipeline3
+# eptic-pipeline
+
+Codebase for all things EPTIC
 
 # Installation
 
