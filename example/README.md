@@ -42,3 +42,9 @@ Recommended software: [**Bertalign**]([https://github.com/m-bain/whisperX](https
 ### 4. Manual metadata selection and review
 
 Insert ```speech_type``` and other metadata and review transcription. 
+
+### 5. Convert to .txt (pretgd)
+
+### 6. Format eptic for tagging and Tag with SE
+
+### 7. Postprocess SE tagged files (vert)
