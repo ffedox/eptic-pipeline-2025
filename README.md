@@ -21,3 +21,7 @@ Additionally, you may want to [install ffmpeg](https://ffmpeg.org/download.html)
 2. Transcription
 3. Sentence alignment
 4. Manual metadata selection and review
+
+# Contact
+
+[Alice Fedotova](https://www.linkedin.com/in/alice-fedotova/) – [ffedox](https://github.com/ffedox) – [alice.fedotova@studio.unibo.it](mailto:alice.fedotova2@unibo.it)
