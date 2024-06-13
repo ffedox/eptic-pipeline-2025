@@ -4,7 +4,7 @@ Developer-side code and documentation for the construction of EPTIC.
 
 # Installation
 
-Installing [Bertalign](https://github.com/bfsujason/bertalign) and [WhisperX](https://github.com/m-bain/whisperX) in 5 steps:
+Installing [Bertalign](https://github.com/bfsujason/bertalign) and [WhisperX](https://github.com/m-bain/whisperX) in 4 steps:
 
 ```
 git clone https://github.com/ffedox/eptic-pipeline/
