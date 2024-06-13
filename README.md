@@ -13,8 +13,6 @@ conda env create -f environment.yml
 conda activate eptic-pipeline
 ```
 
-When reusing this repository activate the conda environment again with conda activate pipeline-eptic2.
-
 Additionally, you may want to [install ffmpeg](https://ffmpeg.org/download.html) for manipulating video files and extracting audio tracks.
 
 # EPTIC Workflow
