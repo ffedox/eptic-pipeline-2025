@@ -72,7 +72,7 @@ def process_xml_content(row):
 
 # Main process
 if __name__ == '__main__':
-    folder_path = '/home/afedotova/eptic-pipeline/eptic-pipeline/scripts/alignments'
+    folder_path = '/home/afedotova/eptic-pipeline/scripts/alignments'
     for csv_file in glob.glob(os.path.join(folder_path, '*.csv')):
         formatted_file_path = convert_csv_to_intertext_and_save(csv_file)
         update_original_files_with_formatted_content(formatted_file_path)

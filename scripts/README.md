@@ -12,6 +12,8 @@ All the rest (metadata, subtitles) is assumed to be there but subtitles can be m
 a folder with all text ids by language (ids)
 a folder with all alignment pairs by language pair (alignments)
 
+cd bertalign
+
 Step 1
 
 align_texts_new_pipeline.py

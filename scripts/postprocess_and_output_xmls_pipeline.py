@@ -68,8 +68,6 @@ def process_files(folder_path):
         
         print(f"Refined XML saved to: {output_xml_path}")
 
-
-
 if __name__ == '__main__':
-    folder_path = '/home/afedotova/bertalign/trash/lang_combinations'
+    folder_path = '/home/afedotova/eptic-pipeline/eptic-pipeline/scripts/alignments'
     process_files(folder_path)
