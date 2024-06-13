@@ -7,15 +7,12 @@ Pipeline to
 
 All the rest (metadata, subtitles) is assumed to be there but subtitles can be missing
 
+**Requirements:**
+
+a folder with all text ids by language (ids)
+a folder with all alignment pairs by language pair (alignments)
+
 Step 1
-
-compute_all_possible_alignments.py
-
-to create folder alignments
-
-folder alignments = text_combinations.zip, the alignments to be performed 
-
-Step 2
 
 align_texts_new_pipeline.py
 

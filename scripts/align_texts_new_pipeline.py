@@ -59,8 +59,8 @@ def process_files(texts_data_path, alignment_files_folder):
             print(f"No valid data to process in {alignment_file_path}.")
 
 def main():
-    texts_data_path = '/home/afedotova/bertalign/database/texts.xlsx'
-    alignment_files_folder = '/home/afedotova/bertalign/trash/lang_combinations'
+    texts_data_path = '/home/afedotova/eptic-pipeline/eptic-pipeline/database/texts.xlsx'
+    alignment_files_folder = '/home/afedotova/eptic-pipeline/eptic-pipeline/scripts/alignments'
     process_files(texts_data_path, alignment_files_folder)
 
 if __name__ == '__main__':
