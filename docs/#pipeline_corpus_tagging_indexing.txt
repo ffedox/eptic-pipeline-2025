@@ -1,0 +1,331 @@
+===============================
+= CORPUS ANNOTATION (SUMMARY) =
+===============================
+We start from raw files (transcriptions/reports) and we:
+
+- align files (i.e. whole subcorpora) with Intertext, and export using default format: segmented_file1 + segmented_file2 + alignment_file; by "segmented_file" we mean file split into sentences using Intertext rules. It's of vital importance that each subcorpus is imported into Intertext only once, and every new alignment involving it must be carried out using the previously imported version of that subcorpus, and not importing it again from scratch. This ensures that sentence IDs remain the same for all alignments.
+
+- pre-process alignment file (it will have to be processed again after corpora are indexed) with "preprocess_intertext_files.pl". This script transforms XML files produced by Intertext into files in the tab separated format expected by "convert_alignments_to_noske.py"
+
+- using segmented files as a basis, carry out audio/video alignment. This can done from some subtitling software of choice, but again it is crucial that each sentence is preceded by the tag <s id="[123]"> as produced by Intertext
+
+- pre-process the corpus before POS-tagging, importing timestamps into "s" tags of the subcorpus files. First convert subtitle files using "transform_subs_into_metadata.pl" and then process the sub-corpus using "format_corpus_for_tagging.pl"
+
+- POS tag the sub-corpus file using the SketchEngine tagger
+
+- post-process the corpus, inserting EPTIC-specific tags, correcting known tagging mistakes, turning lempos with simple lemmas and so on
+
+IMPORTANT: to avoid problems at the indexing stage, sub-corpus names (including file names!!!) must NOT contain dashes ( "-"). Only underscores ("_") and dots (".") are allowed
+
+Below is the final format of the corpus, ready for indexing into NoSketchEngine (first block = text header, second block = sentence tag, third block = POS-tagged text body).
+
+******************************************************************
+<text id="0001en_sp_st" date="17-01-11" length="short" lengthw="232" duration="short" durations="76" speed="high" speedwm="182.7" delivery="read" topic="Politics" topicspec="Order of business" type="en_sp_st" comments="NA">
+<speaker name="Tavares Rui" gender="M" country="Portugal" native="n" politfunc="MEP" politgroup="GUE-NGL">
+<st language="NA" length="NA" lengthw="NA" duration="NA" durations="NA" speed="NA" speedwm="NA" delivery="NA">
+<interpreter gender="NA" native="NA">
+
+<s id="2" video="http://amelia.sslmit.unibo.it/video/video.php?id=0001en_sp_st&start=00:06.6&end=00:08.0">
+
+Thank	VV	thank
+you	PP	you
+President	NP	President
+<g/>
+.	SENT	.
+******************************************************************
+
+================================
+= CORPUS ANNOTATION (COMMANDS) =
+================================
+
+# From SRT files (the 00*, 10*, 20* part of the command) to NoSke-compliant format  
+
+for i in 00*; do transform_subs_into_metadata.pl $i >> ../subs.en_sp_st; done;
+for i in 00*; do transform_subs_into_metadata.pl $i >> ../subs.it_sp_tt; done;
+for i in 00*; do sl_transform_subs_into_metadata.pl $i >> ../subs.sl_sp_tt; done;
+
+for i in 20*; do transform_subs_into_metadata.pl $i >> ../subs.fr_sp_st; done;
+for i in 20*; do transform_subs_into_metadata.pl $i >> ../subs.en_sp_tt_from_fr; done;
+
+for i in 10*; do transform_subs_into_metadata.pl $i >> ../subs.it_sp_st; done;
+for i in 10*; do transform_subs_into_metadata.pl $i >> ../subs.en_sp_tt_from_it; done;
+
+
+# Pre-process and insert video alignments. NB: Input files are the XML files produced by Intertext!!! If no SUB file is present (because it is not relevant or because we still don't have it use an empty file)
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.en_sp_st EPTIC.en_sp_st.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.en_sp_st.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.en_sp_tt_from_fr EPTIC.en_sp_tt_from_fr.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.en_sp_tt_from_fr.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.en_sp_tt_from_it EPTIC.en_sp_tt_from_it.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.en_sp_tt_from_it.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.en_wr_st.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.en_wr_st.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.en_wr_tt_from_fr.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.en_wr_tt_from_fr.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.en_wr_tt_from_it.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.en_wr_tt_from_it.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.fr_sp_st EPTIC.fr_sp_st.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.fr_sp_st.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.fr_sp_tt.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.fr_sp_tt.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.fr_wr_st.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.fr_wr_st.pretgd
+
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.fr_wr_tt.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.fr_wr_tt.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.it_sp_st EPTIC.it_sp_st.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.it_sp_st.pretgd
+
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.it_sp_tt EPTIC.it_sp_tt.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.it_sp_tt.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.it_wr_st.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.it_wr_st.pretgd
+
+format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/2.alignment+XML_files/video_alignment/subs.empty EPTIC.it_wr_tt.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v3/3.pre_pos_files/EPTIC.it_wr_tt.pretgd
+
+
+./sl_format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v2/slovene_addition/2.sl_alignment+XML_files/video_alignment/subs.sl_sp_tt EPTIC.sl_sp_tt.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v2/slovene_addition/3.sl_pre_pos_files/EPTIC.sl_sp_tt.pretgd
+
+./sl_format_eptic_for_tagging.pl /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v2/slovene_addition/2.sl_alignment+XML_files/video_alignment/subs.empty EPTIC.sl_wr_tt.xml > /Users/adriano/Google\ Drive/eptic_11_wip/eptic11_v2/slovene_addition/3.sl_pre_pos_files/EPTIC.sl_wr_tt.pretgd
+
+
+
+
+# Tagging performed using the "create corpus function" of SketchEngine
+
+# Post-processing of vertical files produced by SkE
+
+for i in *vert; do post_process_vertical_files.pl $i > "eptic_"$i; done;
+
+
+==================================
+= CORPUS INDEXING 1 (PRELIMINARY)=
+==================================
+
+# Load files on amelia.sslmit.unibo.it
+
+Set up configuration (registry) file. See an example in folder: 5.NoSkE_files/registry
+
+# Copy configuration file in:
+
+/var/lib/manatee/registry
+
+# Copy (sub)corpus file in (notice the .vert extension, probably not needed, but to be on the safe side...):
+
+/var/lib/manatee/vert/EPTIC11_v2/corpus1.vert
+
+# We're ready to compile the corpus. Notice that at this stage we DO NOT compile alignments. The redirection of stdout to file is needed at later stage (after alignments are compiled), but it doesn't hurt here:
+
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_sp_st > out
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_sp_tt_from_fr > out1
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_sp_tt_from_it > out2
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_wr_st > out3
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_wr_tt_from_fr > out4
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_wr_tt_from_it > out5
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_sp_st > out6
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_sp_tt > out7
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_wr_st > out8
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_wr_tt > out9
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_sp_st > out10
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_sp_tt > out11
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_wr_st > out12
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_wr_tt > out13
+
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_sl_sp_tt > out14
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_sl_wr_tt > out15
+
+
+
+================================
+= CORPUS INDEXING 2 (ALIGNMENT)=
+================================
+
+# Pre-process files produced by Intertext (e.g. "EPTIC.en_sp_st.en_wr_st.xml"). NB: the order in which the names of the corpora appear in the filename is actually reversed with respect to the order of the columns in the file itself. Thus, if the file is named "alignment.corpusA.corpusB", the first "column" (i.e. the number before semi-colon) refers to sentence IDs in corpus B, and the second "column" refers to sentence IDs in corpus A. Moreover, NoSkE expects a simpler, non-XML file as input for alignment. 
+
+# These are the RegExs needed to convert from Intertext to NoSkE format:
+# 1. /.+xtargets='// (replace with nothing)
+# 2. /'.+// (replace with nothing)
+# 3. /;/\t/ (replace ; with tab)
+# 4. / /,/ (replace space with comma)
+# 5. /^\t/-1\t/ (replace line-initial tab with -1+tab)
+# 6. /\t$/\t-1/ (replace line-final tab with tab+-1)
+# 7. /([0-9]+,)([0-9]+,)+([0-9]+)/\1\3/ (if there are more than two numbers in a column, only include the first and the last one)
+
+# We do all this with a Perl oneliner, which converts Intertext alignment files into files that are readable by the NoSkE. Notice that at this stage we reverse the order of columns in the file to match the filename
+
+for i in eptic*; do perl -ane "s/^<(\?xml|\/?linkGRp).*\n//gi; s/^.+xtargets=\'//; s/\' status.+//; s/ /,/g; print" $i | perl -ane 's/^([0-9\:]+),([0-9\:]+,)*([0-9\:]+);/$1,$3;/;print;' | perl -ane 's/;([0-9\:]+),([0-9\:]+,)*([0-9\:]+)/;$1,$3/;print;' | perl -ane 's/^;/-1\t/; s/;$/\t-1/; s/;/\t/;print;' | awk -F "\t" '{print $2 "\t" $1}' > $i"_noske_ready.txt"; done;
+
+
+# *After* compiling the corpus we have to convert the alignment file produced by our pre-processing to the actual format that is expected by NoSkE. The problem is that the pre-processed (and the Intertext) file use the "id" attribute of the sentence element (<s id="123") to mark alignments, whereas NoSkE disregards the ID attribute when indexing the alignments, and counts "s" elements by itself. E.g. even if the first sentence in the corpus is marked by Intertext as having id=2 (because sentence 1 is the header of the file), NoSkE will count it as 0 (because it starts counting from 0 and because it does not include headers in its count). So, on the processed output of Intertext do the following:
+
+#NB registry has to be in /corpora/registry (if not create create symbolic link) 
+
+convert_alignments_to_noske.py eptic_en_sp_st eptic_en_wr_st EPTIC.en_sp_st.en_wr_st.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_sp_st.en_wr_st.txt
+convert_alignments_to_noske.py eptic_en_sp_st eptic_fr_sp_tt EPTIC.en_sp_st.fr_sp_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_sp_st.fr_sp_tt.txt
+convert_alignments_to_noske.py eptic_en_sp_st eptic_fr_wr_tt EPTIC.en_sp_st.fr_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_sp_st.fr_wr_tt.txt
+convert_alignments_to_noske.py eptic_en_sp_st eptic_it_sp_tt EPTIC.en_sp_st.it_sp_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_sp_st.it_sp_tt.txt
+convert_alignments_to_noske.py eptic_en_sp_st eptic_it_wr_tt EPTIC.en_sp_st.it_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_sp_st.it_wr_tt.txt
+convert_alignments_to_noske.py eptic_en_sp_tt_from_fr eptic_en_wr_tt_from_fr EPTIC.en_sp_tt_from_fr.en_wr_tt_from_fr.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_sp_tt_from_fr.en_wr_tt_from_fr.txt
+convert_alignments_to_noske.py eptic_en_sp_tt_from_it eptic_en_wr_tt_from_it EPTIC.en_sp_tt_from_it.en_wr_tt_from_it.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_sp_tt_from_it.en_wr_tt_from_it.txt
+convert_alignments_to_noske.py eptic_en_wr_st eptic_fr_sp_tt EPTIC.en_wr_st.fr_sp_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_wr_st.fr_sp_tt.txt
+convert_alignments_to_noske.py eptic_en_wr_st eptic_fr_wr_tt EPTIC.en_wr_st.fr_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_wr_st.fr_wr_tt.txt
+convert_alignments_to_noske.py eptic_en_wr_st eptic_it_sp_tt EPTIC.en_wr_st.it_sp_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_wr_st.it_sp_tt.txt
+convert_alignments_to_noske.py eptic_en_wr_st eptic_it_wr_tt EPTIC.en_wr_st.it_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.en_wr_st.it_wr_tt.txt
+convert_alignments_to_noske.py eptic_fr_sp_st eptic_en_sp_tt_from_fr EPTIC.fr_sp_st.en_sp_tt_from_fr.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_sp_st.en_sp_tt_from_fr.txt
+convert_alignments_to_noske.py eptic_fr_sp_st eptic_en_wr_tt_from_fr EPTIC.fr_sp_st.en_wr_tt_from_fr.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_sp_st.en_wr_tt_from_fr.txt
+convert_alignments_to_noske.py eptic_fr_sp_st eptic_fr_wr_st EPTIC.fr_sp_st.fr_wr_st.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_sp_st.fr_wr_st.txt
+convert_alignments_to_noske.py eptic_fr_sp_tt eptic_fr_wr_tt EPTIC.fr_sp_tt.fr_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_sp_tt.fr_wr_tt.txt
+convert_alignments_to_noske.py eptic_fr_sp_tt eptic_it_sp_tt EPTIC.fr_sp_tt.it_sp_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_sp_tt.it_sp_tt.txt
+convert_alignments_to_noske.py eptic_fr_sp_tt eptic_it_wr_tt EPTIC.fr_sp_tt.it_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_sp_tt.it_wr_tt.txt
+convert_alignments_to_noske.py eptic_fr_wr_st eptic_en_sp_tt_from_fr EPTIC.fr_wr_st.en_sp_tt_from_fr.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_wr_st.en_sp_tt_from_fr.txt
+convert_alignments_to_noske.py eptic_fr_wr_st eptic_en_wr_tt_from_fr EPTIC.fr_wr_st.en_wr_tt_from_fr.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.fr_wr_st.en_wr_tt_from_fr.txt
+convert_alignments_to_noske.py eptic_it_sp_st eptic_en_sp_tt_from_it EPTIC.it_sp_st.en_sp_tt_from_it.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_sp_st.en_sp_tt_from_it.txt
+convert_alignments_to_noske.py eptic_it_sp_st eptic_en_wr_tt_from_it EPTIC.it_sp_st.en_wr_tt_from_it.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_sp_st.en_wr_tt_from_it.txt
+convert_alignments_to_noske.py eptic_it_sp_st eptic_it_wr_st EPTIC.it_sp_st.it_wr_st.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_sp_st.it_wr_st.txt
+convert_alignments_to_noske.py eptic_it_sp_tt eptic_fr_wr_tt EPTIC.it_sp_tt.fr_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_sp_tt.fr_wr_tt.txt
+convert_alignments_to_noske.py eptic_it_sp_tt eptic_it_wr_tt EPTIC.it_sp_tt.it_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_sp_tt.it_wr_tt.txt
+convert_alignments_to_noske.py eptic_it_wr_st eptic_en_sp_tt_from_it EPTIC.it_wr_st.en_sp_tt_from_it.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_wr_st.en_sp_tt_from_it.txt
+convert_alignments_to_noske.py eptic_it_wr_st eptic_en_wr_tt_from_it EPTIC.it_wr_st.en_wr_tt_from_it.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_wr_st.en_wr_tt_from_it.txt
+convert_alignments_to_noske.py eptic_it_wr_tt eptic_fr_wr_tt EPTIC.it_wr_tt.fr_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' >  alignment.it_wr_tt.fr_wr_tt.txt
+
+convert_alignments_to_noske.py eptic_en_sp_st eptic_sl_sp_tt eptic.en_sp_st.sl_sp_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' > alignment.en_sp_st.sl_sp_tt.txt
+convert_alignments_to_noske.py eptic_en_sp_st eptic_sl_wr_tt eptic.en_sp_st.sl_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' > alignment.en_sp_st.sl_wr_tt.txt
+convert_alignments_to_noske.py eptic_en_wr_st eptic_sl_sp_tt eptic.en_wr_st.sl_sp_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' > alignment.en_wr_st.sl_sp_tt.txt
+convert_alignments_to_noske.py eptic_en_wr_st eptic_sl_wr_tt eptic.en_wr_st.sl_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' > alignment.en_wr_st.sl_wr_tt.txt
+convert_alignments_to_noske.py eptic_sl_sp_tt eptic_sl_wr_tt eptic.sl_sp_tt.sl_wr_tt.xml_noske_ready.txt | perl -ane 's/ //g; s/^\-1[ \t]+\-1\n//; s/(-1,|,-1)//g; print;' > alignment.sl_sp_tt.sl_wr_tt.txt
+
+
+# At this point, we need to produce ALIGNMENT file for the opposite direction, i.e. alignments from corpus2 to corpus 1, by doing:
+
+awk -F "\t" '{print $2 "\t" $1}' alignment.corpus1.corpus2.txt > alignment.corpus2.corpus1.txt
+
+# I.e.:
+
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_st.en_wr_st.txt > alignment.en_wr_st.en_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_st.fr_sp_tt.txt > alignment.fr_sp_tt.en_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_st.fr_wr_tt.txt > alignment.fr_wr_tt.en_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_st.it_sp_tt.txt > alignment.it_sp_tt.en_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_st.it_wr_tt.txt > alignment.it_wr_tt.en_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_tt_from_fr.en_wr_tt_from_fr.txt > alignment.en_wr_tt_from_fr.en_sp_tt_from_fr.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_tt_from_it.en_wr_tt_from_it.txt > alignment.en_wr_tt_from_it.en_sp_tt_from_it.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_wr_st.fr_sp_tt.txt > alignment.fr_sp_tt.en_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_wr_st.fr_wr_tt.txt > alignment.fr_wr_tt.en_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_wr_st.it_sp_tt.txt > alignment.it_sp_tt.en_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_wr_st.it_wr_tt.txt > alignment.it_wr_tt.en_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_sp_st.en_sp_tt_from_fr.txt > alignment.en_sp_tt_from_fr.fr_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_sp_st.en_wr_tt_from_fr.txt > alignment.en_wr_tt_from_fr.fr_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_sp_st.fr_wr_st.txt > alignment.fr_wr_st.fr_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_sp_tt.fr_wr_tt.txt > alignment.fr_wr_tt.fr_sp_tt.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_sp_tt.it_sp_tt.txt > alignment.it_sp_tt.fr_sp_tt.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_sp_tt.it_wr_tt.txt > alignment.it_wr_tt.fr_sp_tt.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_wr_st.en_sp_tt_from_fr.txt > alignment.en_sp_tt_from_fr.fr_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.fr_wr_st.en_wr_tt_from_fr.txt > alignment.en_wr_tt_from_fr.fr_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_sp_st.en_sp_tt_from_it.txt > alignment.en_sp_tt_from_it.it_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_sp_st.en_wr_tt_from_it.txt > alignment.en_wr_tt_from_it.it_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_sp_st.it_wr_st.txt > alignment.it_wr_st.it_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_sp_tt.fr_wr_tt.txt > alignment.fr_wr_tt.it_sp_tt.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_sp_tt.it_wr_tt.txt > alignment.it_wr_tt.it_sp_tt.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_wr_st.en_sp_tt_from_it.txt > alignment.en_sp_tt_from_it.it_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_wr_st.en_wr_tt_from_it.txt > alignment.en_wr_tt_from_it.it_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.it_wr_tt.fr_wr_tt.txt > alignment.fr_wr_tt.it_wr_tt.txt
+
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_st.sl_sp_tt.txt > alignment.sl_sp_tt.en_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_wr_st.sl_wr_tt.txt > alignment.sl_wr_tt.en_wr_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_sp_st.sl_wr_tt.txt > alignment.sl_wr_tt.en_sp_st.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.sl_sp_tt.sl_wr_tt.txt > alignment.sl_wr_tt.sl_sp_tt.txt
+awk -F "\t" '{print $2 "\t" $1}' alignment.en_wr_st.sl_sp_tt.txt > alignment.sl_sp_tt.en_wr_st.txt
+
+
+
+# We are almost ready to re-index the corpora, this time including the alignments. Add the following configuration parameters to registry files.
+
+******************************************************************
+ALIGNSTRUCT "s"
+
+ALIGNED "corpus2,corpus3"
+
+ALIGNDEF "/storage/manatee/aligndef_files/alignment.corpus1.corpus2.txt,/storage/manatee/aligndef_files/alignment.corpus1.corpus3.txt"
+******************************************************************
+
+# Here:
+# - ALIGNSTRUCT is the element in the pseudo-XML (vert) file that is aligned across corpora (sentences)
+# - ALIGNED indicates the name(s) of the corpora to which the corpus is aligned (multiple names are separated by commas)
+# - ALIGNDEF contains the path to the alignment definition files (i.e. the alignment files produced by Intertext and then pre-processed); if multiple corpora are present, their names must be in the same order as in the ALIGNED line, and must be separated by commas.
+
+# Notice that for the compilation process to be succesful, all corpora that are aligned must be aligned bi-directionally. I.e. if the registry file of corpus1 contains the above alignment information pointing to corpus2, then corpus2 must have specular information.
+
+# NOW RE-COMPILE all corpora. Watch out! Redirection of output messages to file out for the indexing command is needed to check for errors in alignments. Look for phrase "not in the sequence", because this signals that alignment won't be encoded correctly.
+
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_sp_st > outB
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_sp_tt_from_fr > out1B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_sp_tt_from_it > out2B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_wr_st > out3B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_wr_tt_from_fr > out4B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_en_wr_tt_from_it > out5B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_sp_st > out6B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_sp_tt > out7B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_wr_st > out8B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_fr_wr_tt > out9B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_sp_st > out10B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_sp_tt > out11B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_wr_st > out12B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_it_wr_tt > out13B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_sl_sp_tt > out14B
+sudo compilecorp --recompile-corpus --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /var/lib/manatee/registry/eptic_sl_wr_tt > out15B
+
+=======================
+=FINALISING THE CORPUS=
+=======================
+
+At the end, after compiling the corpus, add its name to the list of corpora available in the NoSkE interface by editing the following file(s):
+
+/var/www/virtualhosts/corpora.dipintra.it/public/run.cgi
+/var/www/virtualhosts/corpora.dipintra.it/public/eptic.cgi
+/var/www/virtualhosts/corpora.dipintra.it/private/run.cgi
+
+corplist = ['susanne', 'bnc']							# contains a list of available corpora. Add 'corpus1' in []
+
+
+
+
+====
+Random commands that may be needed:
+
+# rename texts/files
+for i in eptic*; do perl -ane 's/en-sp-st/en_sp_st/g; s/en-sp-tt-from-fr/en_sp_tt_from_fr/g; s/en-sp-tt-from-it/en_sp_tt_from_it/g; s/en-wr-st/en_wr_st/g; s/en-wr-tt-from-fr/en_wr_tt_from_fr/g; s/en-wr-tt-from-it/en_wr_tt_from_it/g; s/fr-sp-st/fr_sp_st/g; s/fr-sp-tt/fr_sp_tt/g; s/fr-wr-st/fr_wr_st/g; s/fr-wr-tt/fr_wr_tt/g; s/it-sp-st/it_sp_st/g; s/it-sp-tt/it_sp_tt/g; s/it-wr-st/it_wr_st/g; s/it-wr-tt/it_wr_tt/g; s/st-in-en/en_sp_st/g; s/tt-in-en/en_sp_tt/g; s/st-tr-en/en_wr_st/g; s/tt-tr-en/en_wr_tt/g; s/st-in-fr/fr_sp_st/g; s/tt-in-fr/fr_sp_tt/g; s/st-tr-fr/fr_wr_st/g; s/tt-tr-fr/fr_wr_tt/g; s/st-in-it/it_sp_st/g; s/tt-in-it/it_sp_tt/g; s/st-tr-it/it_wr_st/g; s/tt-tr-it/it_wr_tt/g; print;' $i > $i"_new.txt"; done;
+
+# change the "type" metadatum
+for i in *.xml; do perl -ane 's/type="en_sp_st"/type="EN spoken sources"/; s/type="en_sp_tt_from_fr"/type="EN interpretations from FR"/; s/type="en_sp_tt_from_it"/type="EN interpretations from IT"/; s/type="en_wr_st"/type="EN written sources"/; s/type="en_wr_tt_from_fr"/type="EN translations from FR"/; s/type="en_wr_tt_from_it"/type="EN translations from IT"/; s/type="fr_sp_st"/type="FR spoken sources"/; s/type="fr_sp_tt"/type="FR interpretations"/; s/type="fr_wr_st"/type="FR written sources"/; s/type="fr_wr_tt"/type="FR translations"/; s/type="it_sp_st"/type="IT spoken sources"/; s/type="it_sp_tt"/type="IT interpretations"/; s/type="it_wr_st"/type="IT written sources"/; s/type="it_wr_tt"/type="IT translations"/; print;' $i > $i"_new.txt"; done;
+
+# change file names in registry files
+
+for i in eptic_*; do perl -ane 's/st_in_en/en_sp_st/g; s/tt_in_en_from_fr/en_sp_tt_from_fr/g; s/tt_in_en_from_it/en_sp_tt_from_it/g; s/st_tr_en/en_wr_st/g; s/tt_tr_en_from_fr/en_wr_tt_from_fr/g; s/tt_tr_en_from_it/en_wr_tt_from_it/g; s/st_in_fr/fr_sp_st/g; s/tt_in_fr_from_en/fr_sp_tt/g; s/st_tr_fr/fr_wr_st/g; s/tt_tr_fr_from_en/fr_wr_tt/g; s/st_in_it/it_sp_st/g; s/tt_in_it_from_en/it_sp_tt/g; s/st_tr_it/it_wr_st/g; s/tt_tr_it_from_en/it_wr_tt/g; print;' $i > $i"_new.txt"; done;
+
+#remove hyphens (but not underscores!) from headers
+for i in *txt; do perl -ane 'if (/#text_id=/) {s/-/ /g; s/date="([0-9]{2}) ([0-9]{2}) ([0-9]{2}) [a-z]"/date="$1-$2-$3"/g; s/GUE NGL/GUE-NGL/; s/Verts ALE/Verts-ALE/; print;} else {print;}' $i > $i"_new.txt"; done;
+
+
+#rename alignment files
+rename -s st_in_en en_sp_st *
+rename -s tt_in_en_from_fr en_sp_tt_from_fr *
+rename -s tt_in_en_from_it en_sp_tt_from_it *
+rename -s st_tr_en en_wr_st *
+rename -s tt_tr_en_from_fr en_wr_tt_from_fr *
+rename -s tt_tr_en_from_it en_wr_tt_from_it *
+rename -s st_in_fr fr_sp_st *
+rename -s tt_in_fr_from_en fr_sp_tt *
+rename -s st_tr_fr fr_wr_st *
+rename -s tt_tr_fr_from_en fr_wr_tt *
+rename -s st_in_it it_sp_st *
+rename -s tt_in_it_from_en it_sp_tt *
+rename -s st_tr_it it_wr_st *
+rename -s tt_tr_it_from_en it_wr_tt *
+
+# command for video conversion. Where 2 is the number of the audio track (cf. VLC info). Use the second command if the first one doesn's work (0:0 is the video track, 0:5 is the number of the audio track)
+
+ffmpeg -ac 2 -i 1/0001.wmv 1/0001.mp4
+ffmpeg -i 11/0011tt-in-it.mp4 -map 0:0 -map 0:5 ../videos/0011tt-in-it.mp4
+ffmpeg -i 0001.wmv -map 0:22 -map 0:19 0001_SL.mp4
+
+
+0033.mp4

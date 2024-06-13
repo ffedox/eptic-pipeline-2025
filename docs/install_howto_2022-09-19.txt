@@ -1,0 +1,257 @@
+Installation on Ubuntu 20.04
+
+Get source packages (tar.gz format) from:
+
+https://nlp.fi.muni.cz/trac/noske
+
+############################
+# PRELIMINARY REQUIREMENTS #
+############################
+
+apt-get install python3-prctl python3-openpyxl apache2 python-dev-is-python3
+
+#####################
+# ENABLE APACHE CGI #
+#####################
+
+a2enmod cgid
+systemctl restart apache2
+
+# create a test script in
+
+/usr/lib/cgi-bin/test_script
+
+#!/usr/bin/perl
+print "Content-type: text/html\n\n";
+print "Hello CGI\n";
+
+# make it executable
+
+chmod 755 /usr/lib/cgi-bin/test_script
+
+# try to access
+
+curl localhost/cgi-bin/test_script
+
+# create directory for bonito
+
+mkdir /var/www/bonito
+
+# enable CGI in that directory by creating a conf file in
+#
+# /etc/apache2/conf-available/bonito.conf
+#
+# with the following content
+
+Alias /crystal /var/www/crystal
+Alias /bonito /var/www/bonito
+<Directory "/var/www/bonito">
+    Options +ExecCGI
+    AddHandler cgi-script .cgi .pl .py .rb
+</Directory>
+
+# enable configuration
+
+a2enconf bonito
+systemctl restart apache2
+
+# then test it by placing the test script in the bonito dir
+
+cp /usr/lib/cgi-bin/test_script /var/www/bonito/test_script.pl
+
+curl http://localhost/bonito/test_script.pl
+
+# remove test script to avoid confusion:
+
+rm /var/www/bonito/test_script.pl
+
+###########
+# MANATEE #
+###########
+
+# Install pre-requisite packages
+apt-get install build-essential checkinstall libpcre3-dev libltdl-dev python3-dev swig libffi-dev
+
+# decompress, compile and install Manatee:
+tar xzvf manatee-open-<version>.tar.gz
+cd manatee-open-<version>
+./configure --with-pcre
+make
+make install
+
+# The install script will tell you something like:
+#
+# Libraries have been installed in: /usr/local/lib/python<version>/site-packages
+#
+# this means that you need to add "/usr/local/lib/python<version>/site-packages/" to PYTHONPATH, 
+# do this by adding the following line to /etc/environment (you'll need to log out and in
+# again for this to take effect), change this line according to your Python version:
+
+PYTHONPATH="/usr/local/lib/python3.8/site-packages/"
+
+# since apache does not read /etc/environment, the currently accepted hack to make manatee work is to copy the local packages to the dist packages and replace relevant lines in run.cgi
+
+cp -r /usr/local/lib/python3.8/site-packages/* /usr/local/lib/python3.8/dist-packages/
+
+sed -i 's|dist-packages|site-packages|' run.cgi
+
+##########
+# BONITO #
+##########
+
+# decompress, compile and install Bonito:
+
+tar xzvf bonito-open-<version>.tar.gz
+cd bonito-open-<version>
+./configure
+make
+make install
+
+# create DATAPATH for bonito (we created CGI-PATH above, when we enabled apache CGI)
+
+mkdir /var/lib/bonito
+
+./setupbonito /var/www/bonito /var/lib/bonito
+
+# Make sure /var/lib/bonito/ subdirs are writable for a webserver running /var/www/bonito/run.cgi
+# Edit corpus list, default corpus and other global options in /var/www/bonito/run.cgi 
+# Change access options in /var/www/bonito/.htaccess and/or add usernames to /var/lib/bonito/htpasswd
+
+chown -R www-data:www-data /var/lib/bonito
+
+########
+# GDEX #
+########
+
+tar xzvf gdex-<version>.tar.gz
+cd gdex-<version>
+VERSION=<version>
+sed -i "s/<version>/$VERSION/g" setup.py
+./setup.py build
+./setup.py install
+
+###########
+# CRYSTAL #
+###########
+
+tar xzvf crystal-open-<version>.tar.gz
+cd crsytal-open-<version>
+make
+
+# after that, install it
+
+make install VERSION=<version>
+
+###############################
+# INSTALL DEMO CORPUS SUSANNE #
+###############################
+
+# Create dirs for manatee
+
+mkdir -p /var/lib/manatee/vert /var/lib/manatee/registry /var/lib/manatee/data
+
+chmod 755 /var/lib/manatee /var/lib/manatee/vert /var/lib/manatee/registry /var/lib/manatee/data
+
+tar xfj susanne-example-source.tar.bz2
+cp susanne-example-source/source /var/lib/manatee/vert/susanne.vert
+cp susanne-example-source/config /var/lib/manatee/registry/susanne
+
+chmod 644 /var/lib/manatee/registry/susanne
+
+# edit registry file /var/lib/manatee/registry/susanne
+# to make it point to the correct paths to vert file and data directory
+
+VERTICAL "/var/lib/manatee/vert/susanne.vert"
+PATH "/var/lib/manatee/data/susanne"
+
+# compile corpus (set N parameter to the number of CPUs you want to use):
+
+compilecorp --no-ske --parallel=N /var/lib/manatee/registry/susanne
+
+# in case you need to recompile it simply add --recompile-corpus
+
+compilecorp --recompile-corpus --no-ske --parallel=N /var/lib/manatee/registry/susanne
+
+################
+# FINISHING UP #
+################
+
+# now edit run.cgi
+
+emacs /var/www/bonito/run.cgi
+
+    - add susanne to corpora list (it should already look like this):
+    
+	corplist = ['susanne']
+	
+    - set the MANATEE_REGISTRY to point to the correct path, e.g.:
+        os.environ['MANATEE_REGISTRY'] = '/var/lib/manatee/registry/'
+
+edit /var/www/crystal/config.js and point the variable URL_BONITO to the correct bonito page, e.g.:
+
+URL_BONITO: "http://localhost/bonito/run.cgi/",
+
+Access NoSke interface at:
+
+http://localhost/crystal
+
+###############################
+# ENABLE BASIC AUTHENTICATION #
+###############################
+
+A basic .htaccess file looks like this:
+
+AuthType Basic
+AuthName CorporaDipintra
+AuthUserFile /var/lib/bonito/htpasswd
+Require valid-user
+
+Users must be added manually to /var/lib/bonito/htpasswd (or you can build your own registration system)
+
+###################
+# COMMON MISTAKES #
+###################
+
+I.e. the mistakes I made when setting it up:
+
+- Path to compiled manatee python libraries (e.g. /usr/local/lib/python3.8/site-packages/) should be accessible to relevant users (that is the user compiling the corpus and the apache user www-data), so make sure PYTHONPATH is set correctly in /etc/environment so users can compile corpora; you can also add the path to sys.path in run.cgi (but I prefer copying /usr/local/lib/python3.8/site-packages/* to /usr/local/lib/python3.8/dist-packages/, so all scripts can access the libraries)
+
+- The corpus registry file should contain the full path to the corpus data folder (as well as the path to the vert file), otherwise manatee won't be able to locate the corpus (you'll notice that corpus info report a size of zero words and you all queries will return 0 results)
+
+- make sure the path to registry files and data directories is readable by the web server
+
+- in case you run into trouble, it is helpful to TEMPORARILY set this variable somewhere in apache conf (possibly .htaccess) to see python error messages:
+	
+	HttpProtocolOptions Unsafe
+
+	remember to remove it once the problem is fixed
+
+- I couldn't figure out a way of copying crystal and bonito to a virtualhost, so I'll just basically configure everything using the default hostname
+
+#############
+# OLD HACKS #
+#############
+
+Apache doesn't read /etc/environment, therefore PYTHONPATH is not set correctly, this results in two scripts not working because they cannot import the manatee module, I hacked them like this:
+
+	- add this line at the beginning of bonito/run.cgi (right after a similar line adding the path /usr/local/lib/python3.8/site-packages/bonito)
+	
+		if '/usr/local/lib/python3.8/site-packages/' not in sys.path:
+    		sys.path.insert (0, '/usr/local/lib/python3.8/site-packages/')
+    		
+        there's probably be a better way of doing this (i.e. adding PYTHONPATH to Apache env variables), but for now it works
+        
+    - I hacked the /usr/local/bin/mkstats adding the following lines at the top:
+    
+    	import sys
+
+		if '/usr/local/lib/python3.8/site-packages/' not in sys.path:
+    		sys.path.insert (0, '/usr/local/lib/python3.8/site-packages/')
+    	
+		and changing the line from:
+	
+		import sys, os, array, manatee, subprocess
+	
+		to
+	
+    	import os, array, manatee, subprocess

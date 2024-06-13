@@ -1,0 +1,65 @@
+Il file di configurazione va in /var/lib/manatee/registry
+
+VERIFICARE I PERMESSI DEL FILE DI REGISTRY!
+
+VERIFICARE CHE QUESTI PARAMETRI SIANO CORRETTI:
+
+	VERTICAL "/var/lib/manatee/vert/<CORPUS>.vert"
+	PATH "/var/lib/manatee/data/<CORPUS>"
+
+copiare il corpus in:
+
+/var/lib/manatee/vert/<CORPUS>.vert
+
+Poi si compila il corpus con (impostare il parametro N in base alle CPU della macchina):
+
+compilecorp --no-ske --parallel=N /storage/manatee/registry/corpus_name
+
+oppure se si sta ricompilando (ma se ci sono corpora allineati la cosa non gli piace, meglio compilare da zero):
+
+compilecorp --recompile-corpus --no-ske --parallel=N /var/lib/manatee/registry/corpus_name
+
+Esempi a seguire
+
+- senza compilazione parallela:
+
+CORPUS=itwac1
+less /storage/manatee/registry/$CORPUS
+RECOMPILE=--recompile-corpus
+nohup compilecorp $RECOMPILE --no-ske /storage/manatee/registry/$CORPUS >$CORPUS.out 2>$CORPUS.err &
+tail -f $CORPUS.out
+
+- con compilazione parallela
+
+CPUNUM=10 # ATTENZIONE! Spesso utilizzare più CPU fa fallire la compilazione
+CORPUS=itwac1
+RECOMPILE=--recompile-corpus
+less /storage/manatee/registry/$CORPUS
+nohup compilecorp $RECOMPILE --no-ske --parallel=$CPUNUM /storage/manatee/registry/$CORPUS >$CORPUS.out 2>$CORPUS.err &
+tail -f $CORPUS.out
+
+dopo aver compilato il corpus, aggiungerlo alla lista modificando i file:
+
+/var/www/bonito/public/run.cgi 
+/var/www/bonito/private/run.cgi 
+
+ecc.
+
+corplist = ['susanne', 'bnc']							# contains a list of available corpora
+
+altre cose utili:
+
+corpname = 'bnc'										# sets the default corpus
+os.environ['MANATEE_REGISTRY'] = '/corpora/registry'	# is the path to the directory with corpus configuration files
+
+Per eliminare subcorpora dalla cartella pubblica:
+/var/lib/bonito/subcorp/GLOBAL/
+
+
+*********************
+* CORPORA PARALLELI *
+*********************
+
+A quanto pare non gli piace l'opzione --recompile-corpus, quindi non usarla
+
+I corpora vanno indicizzati due volte, al primo tentativo fallisce perché non trova il corpus di destinazione, quindi bisogna ripetere l'operazione

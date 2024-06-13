@@ -1,0 +1,87 @@
+ricordare post_process_vertical_files.pl in generale prima o dopo
+
+----- preparare file -------
+
+una volta messo il pretgd su sketch engine (ricorda expert settings)
+
+1. da download -> vert
+
+2. configure -> expert settings -> corpus configuration 
+
+si può mettere con correzioni nei registry file che ci sono già
+
+questi due file per ogni corpus
+
+e manca sistemare i tag nei vert fipo EPAUSE FPAUSE ecc
+
+
+---- caricare file ------
+
+una volta messo il path 
+
+la cartella dentro /data/ va messa ma quella dentro quella NON va creata, lui usa quella messa nel path per crearla e capire come chiamarla
+
+la cartella il cui path mettiamo in VERTICAL invece va creata (/vert/nomecartella) e bisogna metterci il .vert file dentro
+
+!!!!!!!!!!!niente trattini alti nei nomi dei file!!!!!!!!!!!
+
+il registry va messo in registry
+
+
+
+----- compilare -----
+
+una volta fatte le cose sopra
+
+sudo compilecorp --no-sketches --no-hashw --no-terms --no-biterms --no-bidicts --no-trends --no-lcm /storage/manatee/registry/TESTeptic_en_sp_st > out
+
+
+dopo aver compilato vanno messi i nomi qui
+"""
+At the end, after compiling the corpus, add its name to the list of corpora available in the NoSkE interface by editing the following file(s):
+
+/var/www/virtualhosts/corpora.dipintra.it/public/run.cgi
+/var/www/virtualhosts/corpora.dipintra.it/public/eptic.cgi
+/var/www/virtualhosts/corpora.dipintra.it/private/run.cgi
+"""
+
+PATH -> /var/www/bonito/eptic/run.cgi
+
+
+
+ALIGNMENT
+
+una volta preparati i due aligment file
+
+copiamo qst nel reg
+
+ALIGNSTRUCT "s"
+
+ALIGNED "corpus2,corpus3" # se ce ne fosse uno sarebbe solo corpus2
+
+ALIGNDEF "/storage/manatee/aligndef_files/alignment.corpus1.corpus2.txt,/storage/manatee/aligndef_files/alignment.corpus1.corpus3.txt" -> # NOME DEL FILE DEL REGISTRO il file prodotto degli allinementi in una cartella che chiamiamo /storage/manatee/algndef_files/corpusdelregistroattuale.corpuscheabbiamoinaligned1.txt 
+
+se ci fossero più file in aligndef mettiamo più path tra virgolette
+
+IL FILE A SINISTRA DEVE ESSERE IL CORPUS attuale
+
+
+stessa cosa negli altri corpus che stiamo allineando
+
+
+mettiamo i file di allineamento nella cartella che abbiamo creato prima 
+
+aggiorniamo i file di registro
+
+
+----- COMPILIAMO CON GLI ALLINEAMENTI ------
+
+continua a compilarlo senza recompile, come se fosse da fare da 0
+
+
+
+
+guarda il file di allineamento con intrtext di eros per capire il passaggio di processing che va fatto su noske_ready.txt
+
+
+
