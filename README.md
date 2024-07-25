@@ -23,13 +23,6 @@ The user guide for expanding EPTIC is available here: [SKEPTIC Guidelines for EP
 
 The developer guide for expanding EPTIC is available here: [SKEPTIC Guidelines for EPTIC developers](https://github.com/ffedox/eptic-pipeline/developers.pdf).
 
-# EPTIC Workflow
-
-1. Video and text extraction
-2. Transcription
-3. Sentence alignment
-4. Manual metadata selection and review
-
 # Contact
 
 [Alice Fedotova](https://www.linkedin.com/in/alice-fedotova/) – [ffedox](https://github.com/ffedox) – [alice.fedotova@studio.unibo.it](mailto:alice.fedotova2@unibo.it)
