@@ -33,3 +33,7 @@ The developer guide for expanding EPTIC is available here: [SKEPTIC Guidelines f
 # Contact
 
 [Alice Fedotova](https://www.linkedin.com/in/alice-fedotova/) – [ffedox](https://github.com/ffedox) – [alice.fedotova@studio.unibo.it](mailto:alice.fedotova2@unibo.it)
+
+# Funding
+
+This work is supported by the NextGeneration EU programme, ALMArie CURIE 2021 - Linea SUpER, Ref. CUPJ45F21001470005.
