@@ -1,4 +1,4 @@
-# eptic-pipeline
+# eptic-pipeline-2025
 
 Developer-side code and documentation for the construction of EPTIC.
 
